@@ -1,1 +1,42 @@
+server {
+    listen 80;
+    listen [::]:80;
+    server_name subcultura.fun www.subcultura.fun;
 
+    root /var/www/html/public;
+    index index.php index.html;
+
+    access_log /var/log/nginx/subcultura.fun-access.log;
+    error_log  /var/log/nginx/subcultura.fun-error.log;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    location ~ /\.(?!well-known).* {
+        deny all;
+    }
+
+    location ~ ^/(storage|config|vendor)/ {
+        deny all;
+    }
+
+    location ~ \.(env|log|sql|ini)$ {
+        deny all;
+    }
+
+    location ~* \.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|webp)$ {
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+        try_files $uri =404;
+    }
+
+    client_max_body_size 64m;
+}

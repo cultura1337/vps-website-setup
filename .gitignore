@@ -1,1 +1,9 @@
-
+.env
+.env.*
+vendor/
+node_modules/
+*.log
+*.sql
+*.zip
+*.tar.gz
+.DS_Store

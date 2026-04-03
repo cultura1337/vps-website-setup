@@ -1,69 +1,49 @@
-# Website VPS Deployment
+# Flute CMS on VPS
 
-Deployment and support of a CMS website on Ubuntu VPS using Nginx, PHP-FPM, MariaDB, DNS and SSL.
+Real-world deployment and support of a Flute CMS website on Ubuntu VPS using Nginx, PHP-FPM, MariaDB, DNS and SSL.
 
 ## Overview
 
-This repository documents a real-world deployment of a CMS-based website on a VPS.
+This repository documents a practical VPS deployment of a Flute CMS-based website.
 
-The project demonstrates practical DevOps / Linux administration tasks:
+It reflects a real self-managed environment where the website runs together with other hosted services on the same server. The project demonstrates practical DevOps / Linux administration tasks rather than just a local demo or a theory-only setup.
+
+## Stack
+
+- Ubuntu 22.04.5 LTS
+- Nginx
+- PHP 8.3 / PHP-FPM
+- MariaDB
+- DNS + SSL
+- Flute CMS
+
+## What this case shows
+
 - VPS setup and service management
 - Nginx virtual host configuration
 - PHP-FPM integration
-- MariaDB-backed website deployment
-- DNS and HTTPS setup
+- database-backed CMS deployment
+- HTTPS and domain routing
 - troubleshooting and maintenance
-- hosting multiple services on a single server
+- multi-service hosting on a single VPS
 
-## Environment
+## Real deployment details
 
-- OS: Ubuntu 22.04.5 LTS
-- Web server: Nginx 1.18
-- PHP: PHP 8.3 / PHP-FPM
-- Database: MariaDB 10.6
-- Website root: `/var/www/html/public`
-- App structure: `/var/www/html`
+- App directory: `/var/www/html`
+- Public web root: `/var/www/html/public`
 - Domain: `subcultura.fun`
+- PHP is handled through Unix socket
+- Nginx is used as the front-facing web server
 
-## Website stack
+## Flute CMS notes
 
-This deployment uses a CMS-based PHP application with:
-- `public/` as web root
-- application configs in `config/`
-- bootstrap logic in `bootstrap/`
-- Composer-based PHP dependencies
-- Nginx + PHP-FPM processing
+This deployment was based on the official Flute CMS documentation and adapted for a real VPS environment.
 
-## What was done
+Important implementation points:
+- `public/` is used as the document root
+- requests are routed through `index.php`
+- PHP is handled by PHP-FPM
+- Flute CRON tasks can be run with:
 
-- deployed a CMS website on Ubuntu VPS
-- configured Nginx server blocks
-- configured redirects and HTTPS
-- connected PHP through PHP-FPM socket
-- prepared MariaDB-backed runtime
-- configured file ownership and permissions
-- validated services with systemd and `nginx -t`
-- maintained multiple web/game-related services on the same server
-
-## Skills demonstrated
-
-- Linux administration
-- Nginx configuration
-- PHP-FPM integration
-- MariaDB usage
-- DNS and SSL setup
-- service checks with systemd
-- troubleshooting production issues
-- self-hosted infrastructure maintenance
-
-## Repository structure
-
-- `docs/architecture.md` — service layout and server structure
-- `docs/deployment-steps.md` — deployment flow
-- `docs/troubleshooting.md` — common checks and fixes
-- `configs/nginx/` — example Nginx configurations
-- `scripts/` — helper scripts for setup and diagnostics
-
-## Notes
-
-Sensitive data, real credentials, certificates, and private keys are intentionally excluded.
+```bash
+php flute cron:run

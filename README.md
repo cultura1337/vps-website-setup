@@ -74,7 +74,7 @@
 - MariaDB
 - SSL
 
-Подробно: [`docs/02-server-preparation.md`](docs/server-preparation.md)
+Подробно: [`docs/server-preparation.md`](docs/server-preparation.md)
 
 ### 2. Разместить Flute CMS
 
@@ -90,7 +90,7 @@
 /var/www/html/public
 ```
 
-Подробно: [`docs/03-installation-guide.md`](docs/installation-guide.md)
+Подробно: [`docs/installation-guide.md`](docs/installation-guide.md)
 
 ### 3. Настроить Nginx
 
@@ -108,7 +108,7 @@ Flute использует консольную команду:
 php flute cron:run
 ```
 
-Подробно: [`docs/05-cron-setup.md`](docs/cron-setup.md)
+Подробно: [`docs/cron-setup.md`](docs/cron-setup.md)
 
 ## Мини-чек после деплоя
 

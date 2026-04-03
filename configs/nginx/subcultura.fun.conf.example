@@ -1,42 +1,63 @@
-server {
-    listen 80;
-    listen [::]:80;
-    server_name subcultura.fun www.subcultura.fun;
+#!/usr/bin/env bash
+set -euo pipefail
 
-    root /var/www/html/public;
-    index index.php index.html;
+APP_DIR="/var/www/html"
+PUBLIC_DIR="$APP_DIR/public"
+STORAGE_DIR="$APP_DIR/storage"
+UPLOADS_DIR="$PUBLIC_DIR/uploads"
+PHP_SOCK="/var/run/php/php8.3-fpm.sock"
 
-    access_log /var/log/nginx/subcultura.fun-access.log;
-    error_log  /var/log/nginx/subcultura.fun-error.log;
-
-    location / {
-        try_files $uri $uri/ /index.php?$query_string;
-    }
-
-    location ~ \.php$ {
-        include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;
-        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
-        include fastcgi_params;
-    }
-
-    location ~ /\.(?!well-known).* {
-        deny all;
-    }
-
-    location ~ ^/(storage|config|vendor)/ {
-        deny all;
-    }
-
-    location ~ \.(env|log|sql|ini)$ {
-        deny all;
-    }
-
-    location ~* \.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|webp)$ {
-        expires 30d;
-        add_header Cache-Control "public, immutable";
-        try_files $uri =404;
-    }
-
-    client_max_body_size 64m;
+say() {
+  printf '\n[%s] %s\n' "INFO" "$1"
 }
+
+check_path() {
+  local path="$1"
+  if [[ -e "$path" ]]; then
+    printf "  [OK] %s exists\n" "$path"
+  else
+    printf "  [FAIL] %s missing\n" "$path"
+  fi
+}
+
+check_service() {
+  local svc="$1"
+  if systemctl is-active --quiet "$svc"; then
+    printf "  [OK] service active: %s\n" "$svc"
+  else
+    printf "  [FAIL] service inactive: %s\n" "$svc"
+  fi
+}
+
+say "Checking directories"
+check_path "$APP_DIR"
+check_path "$PUBLIC_DIR"
+check_path "$STORAGE_DIR"
+check_path "$UPLOADS_DIR"
+
+say "Checking key files"
+check_path "$PUBLIC_DIR/index.php"
+check_path "$APP_DIR/flute"
+
+say "Checking services"
+check_service nginx
+check_service php8.3-fpm
+check_service mariadb
+
+say "Checking PHP socket"
+check_path "$PHP_SOCK"
+
+say "Checking nginx config"
+if nginx -t >/tmp/flute-nginx-check.log 2>&1; then
+  echo "  [OK] nginx config test passed"
+else
+  echo "  [FAIL] nginx config test failed"
+  cat /tmp/flute-nginx-check.log
+fi
+
+say "Checking permissions overview"
+namei -l "$APP_DIR" || true
+namei -l "$PUBLIC_DIR" || true
+namei -l "$STORAGE_DIR" || true
+
+say "Done"
